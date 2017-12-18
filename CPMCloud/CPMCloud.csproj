@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -170,15 +171,10 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
-    <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\MasterDataController.cs" />
-    <Compile Include="Controllers\MenusController.cs" />
-    <Compile Include="Controllers\ResourcesController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="CybertronFramework\BaseBusiness.cs" />
     <Compile Include="CybertronFramework\CommonBusiness.cs" />
-    <Compile Include="CybertronFramework\Libraries\ApiClient.cs" />
     <Compile Include="CybertronFramework\Libraries\EncryptionExtension.cs" />
     <Compile Include="CybertronFramework\Libraries\StringUtil.cs" />
     <Compile Include="CybertronFramework\Models\AuthenticationToken.cs" />
@@ -222,12 +218,21 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Common\bootstrap.css" />
+    <Content Include="Content\Common\bootstrap.min.css" />
+    <Content Include="Content\Common\custom.css" />
+    <Content Include="Content\Common\custom.min.css" />
+    <Content Include="Content\Common\font-awesome.css" />
+    <Content Include="Content\Common\font-awesome.min.css" />
+    <Content Include="Content\Common\font-glyphicons.css" />
+    <Content Include="Content\Common\mycss.css" />
     <Content Include="favicon.ico" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
+    <Content Include="fonts\glyphicons-filetypes-regular.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\glyphicons-regular.svg" />
+    <Content Include="fonts\glyphicons-social-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
     <Content Include="Images\Avatar\17156037_1253402538088938_7718839922421342644_n.jpg" />
     <Content Include="Images\Avatar\smile-icon-facebook.png" />
     <Content Include="Images\Icons\g-normal.png" />
@@ -248,6 +253,27 @@
     <Content Include="Scripts\Common\inlineValidation\validationEngine.jquery.css" />
     <Content Include="Scripts\Common\jquery-confirm\jquery-confirm.min.css" />
     <Content Include="Scripts\Common\jquery-confirm\jquery-confirm.min.js" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\glyphicons-filetypes-regular.eot" />
+    <Content Include="fonts\glyphicons-filetypes-regular.ttf" />
+    <Content Include="fonts\glyphicons-filetypes-regular.woff" />
+    <Content Include="fonts\glyphicons-filetypes-regular.woff2" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="fonts\glyphicons-regular.eot" />
+    <Content Include="fonts\glyphicons-regular.ttf" />
+    <Content Include="fonts\glyphicons-regular.woff" />
+    <Content Include="fonts\glyphicons-regular.woff2" />
+    <Content Include="fonts\glyphicons-social-regular.eot" />
+    <Content Include="fonts\glyphicons-social-regular.ttf" />
+    <Content Include="fonts\glyphicons-social-regular.woff" />
+    <Content Include="fonts\glyphicons-social-regular.woff2" />
     <None Include="Scripts\Common\jquery\jquery-1.12.4.intellisense.js" />
     <Content Include="Scripts\Common\jquery\jquery-1.12.4.js" />
     <Content Include="Scripts\Common\jquery\jquery-1.12.4.min.js" />
@@ -2535,9 +2561,6 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\Common\angularJS\angular.min.js.map" />

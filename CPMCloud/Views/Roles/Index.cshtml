@@ -395,21 +395,6 @@
                     $("#roleMenuTbl").DataTable().ajax.reload();
                 }
             }
-            function init() {
-                $('#selectPermisson').modal({
-                    show: false
-                });
-                $http({
-                    method: 'GET',
-                    url: '/Resources/GetApplications'
-                }).then(function successCallback(response) {
-                    $scope.listApplication = response.data;
-                }, function errorCallback(response) {
-
-                });
-            }
-
-            init();
         }]);
         function search() {
             var scope = angular.element($('#ApplicationApp')).scope();

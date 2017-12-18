@@ -43,7 +43,6 @@ namespace CPMCloud.Controllers
         public async Task<ActionResult> GoogleLogin(GoogleAccountModel instance)
         {
            
-            ApiClient client = ApiClient.Instance;
             try
             {
                 if (instance != null)
