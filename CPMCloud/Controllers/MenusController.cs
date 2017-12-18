@@ -1,63 +1,63 @@
 ﻿using CPMCloud.CybertronFramework.Common;
 using CPMCloud.Models;
-using CPMCloud.Models.Common;
 using CPMCloud.Models.Entities;
+using CPMCloud.Models.ViewModels;
+using CybertronFramework;
 using CybertronFramework.Libraries;
 using CybertronFramework.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
+using System.Data.SqlClient;
 using System.Web.Mvc;
 
 namespace CPMCloud.Controllers
 {
     public class MenusController : Controller
     {
+        CommonBusiness commonBu = new CommonBusiness();
         // GET: Menus
         public ActionResult Index()
         {
             return View();
         }
 
-        public async Task<JsonResult> SearchProcess(MenuViewModel formData)
+        public JsonResult SearchProcess(MenuViewModel formData)
         {
-            ApiClient client = ApiClient.Instance;
+            List<SqlParameter> parameters = new List<SqlParameter>();
+            string sql = "SELECT * FROM Menu a WHERE 1 = 1 ";
+            sql += commonBu.MakeFilterString("a.ApplicationID", formData.ApplicationID, ref parameters);
+            sql += commonBu.MakeFilterString("a.Code", formData.Code, ref parameters);
+            sql += commonBu.MakeFilterString("a.Name", formData.Name, ref parameters);
+
+            var data = commonBu.Search<Menu>(formData.DataTable.start, formData.DataTable.length, sql, "MenuID", parameters.ToArray());
             DataTableResponse<Menu> dataTableResponse = new DataTableResponse<Menu>();
-            try
-            {
-                var apiResult = await client.PostApiAsync<JsonResultObject<DataTableResponse<Menu>>, object>(URLResources.SEARCH_MENU + "?offset=" + formData.DataTable.start.ToString() + "&recordPerPage=" + formData.DataTable.length.ToString(),
-                    new { ApplicationId = formData.ApplicationID, Code = StringUtil.NVL(formData.Code), Name = StringUtil.NVL(formData.Name) });
-                if (apiResult != null && apiResult.IsSuccess)
-                {
-                    dataTableResponse = apiResult.Data;
-                }
-
-            }
-            catch (Exception ex)
-            {
-
-            }
+            dataTableResponse = data;
             return Json(dataTableResponse, JsonRequestBehavior.AllowGet);
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<ActionResult> Save(Menu obj)
+        public ActionResult Save(Menu obj)
         {
-            ApiClient client = ApiClient.Instance;
             try
             {
-                if (Permission.HasPermission(RoleCodes.Applications.SEARCH))
+                Menu entities = new Menu();
+                if (obj.MenuID != 0)
                 {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<Menu>, Menu>(Resources.URLResources.SAVE_MENU, obj);
-                    ViewBag.Status = "1";
+                    entities = commonBu.Get<Menu>(obj.MenuID);
+                    if (entities != null)
+                    {
+                        entities.GetTransferData(obj);
+                        commonBu.Update(entities);
+                    }
                 }
                 else
                 {
-                    ViewBag.Status = "0";
+                    entities.GetTransferData(obj);
+                    commonBu.Save(entities);
                 }
+
+                ViewBag.Status = "1";
 
             }
             catch (Exception ex)
@@ -71,38 +71,28 @@ namespace CPMCloud.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> PrepareUpdate(int id)
+        public JsonResult PrepareUpdate(int id)
         {
-            ApiClient client = ApiClient.Instance;
-            try
+            Menu obj = commonBu.Get<Menu>(id);
+            MenuDTO result = new MenuDTO();
+            result.GetTransferData(obj);
+            if (result.MenuPID != null)
             {
-                var apiResult = await client.GetApiAsync<JsonResultObject<Menu>>(URLResources.GET_MENU_BY_ID + id);
-                return Json(apiResult.Data);
+                Menu objP = commonBu.Get<Menu>(result.MenuPID);
+                result.MenuPName = objP.Name;
             }
-            catch (Exception ex)
-            {
-
-            }
-            return Json(null);
+            return Json(result);
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<ActionResult> Delete(int id)
+        public ActionResult Delete(int id)
         {
             ApiClient client = ApiClient.Instance;
             try
             {
-                if (Permission.HasPermission(RoleCodes.Applications.SEARCH))
-                {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<String>, object>(Resources.URLResources.DELETE_MENU + id,
-                    new { });
-                    ViewBag.Status = "1";
-                }
-                else
-                {
-                    ViewBag.Status = "0";
-                }
+                commonBu.Delete<Menu>(id);
+                ViewBag.Status = "1";
 
             }
             catch (Exception ex)
