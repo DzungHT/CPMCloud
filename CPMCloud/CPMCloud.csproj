@@ -172,6 +172,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MasterDataController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="CybertronFramework\BaseBusiness.cs" />
     <Compile Include="CybertronFramework\CommonBusiness.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Common\Constants.cs" />
     <Compile Include="Models\Common\JsonResultObject.cs" />
+    <Compile Include="Models\Common\MailHelper.cs" />
     <Compile Include="Models\Entities\ActionLog.cs" />
     <Compile Include="Models\Entities\Application.cs" />
     <Compile Include="Models\Entities\DomainData.cs" />
@@ -2741,7 +2743,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>62658</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:62658/</IISUrl>
+          <IISUrl>http://localhost:8980/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

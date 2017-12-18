@@ -8,13 +8,13 @@ using CybertronFramework.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Security;
 
 namespace CPMCloud.Controllers
 {
-    [Authorize]
     public class AccountsController : Controller
     {
         CommonBusiness commonBu = new CommonBusiness();
@@ -40,23 +40,24 @@ namespace CPMCloud.Controllers
         
         #region HttpPost
         [HttpPost]
-        public async Task<ActionResult> GoogleLogin(GoogleAccountModel instance)
+        public JsonResult GoogleLogin(GoogleAccountModel instance)
         {
-           
             try
             {
                 if (instance != null)
                 {
                     Session["USER"] = instance;
-                    return Redirect("/Home/Index");
+                    FormsAuthentication.SetAuthCookie(instance.Email,false);
+                    MailHelper.SendEmail(new MailAddress(instance.Email,instance.FullName),"Cảnh báo đăng nhập!","Tài khoản của bạn vừa đăng nhập vào hệ thống CPM");
+                    return Json("0");
                 }
                 ModelState.AddModelError(string.Empty, "Đăng nhập không thành công!");
-                return PartialView("login");
+                return Json("1"); ;
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Đăng nhập không thành công!");
-                return PartialView("login");
+                return Json("2"); ;
             }
         }
         #endregion

@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-signin-client_id" content="981562863577-pdve3k27c8aggkalvd0n01mb9ln42psk.apps.googleusercontent.com">
-    <title> @LoginResources.Title | @ApplicationResources.AppName</title>
+    <title>Đăng nhập</title>
     <!-- Bootstrap -->
     <link href="~/Content/Common/bootstrap.min.css" rel="stylesheet" />
     <!-- Font Awesome -->
@@ -80,19 +80,19 @@
                 <section class="login_content">
                     <form method="post" action="@Url.Action("login","accounts")">
                         @Html.AntiForgeryToken()
-                        <h1>@LoginResources.LoginFormTitle</h1>
+                        <h1>Đăng nhập</h1>
                         <div style="color:red">
                         @Html.ValidationSummary()
                         </div>
                         <div>
-                            <input type="text" name="Username" class="form-control" placeholder="@LoginResources.UsernamePlaceholder" required autofocus/>
+                            <input type="text" name="Username" class="form-control" placeholder="" required autofocus/>
                         </div>
                         <div>
-                            <input type="password" name="Password" class="form-control" placeholder="@LoginResources.PasswordPlaceholder" required />
+                            <input type="password" name="Password" class="form-control" placeholder="" required />
                         </div>
                         <div>
-                            <button class="btn btn-default submit">@LoginResources.btnLogin</button>
-                            <a class="reset_pass" href="#">@LoginResources.ForgotPassword</a>                 
+                            <button class="btn btn-default submit">Đăng nhập</button>
+                            <a class="reset_pass" href="#">Quên mật khẩu</a>                 
                         </div>
                         <div style="text-align:center;">
                             @*<button class="btn btn-default" onclick="loginGoogle()"  id="btnGoogleLogin">Login with Google</button>*@
@@ -101,6 +101,8 @@
                                 <span class="icon"></span>
                                 <span class="buttonText">Đăng nhập bằng Google</span>
                             </div>
+
+                            @*<script src="~/Scripts/Common/CybertronLibrary.js"></script>*@
                             <script>
                                 var userGoogle = {};
                                 $('#customBtn').click(function () {
@@ -135,7 +137,6 @@
                                     });
                                     // signInCallback defined in step 6.
                                     function loginGoogle() {
-                                            console.log('userGoogle', userGoogle);
                                         if (userGoogle) {
                                             $.ajax({
                                                 type: 'POST',
@@ -149,7 +150,14 @@
                                                 },
                                                 contentType: 'application/json; charset=utf-8',
                                                 success: function (result) {
-                                                    // Handle or verify the server response.
+                                                    if (result == "0") {
+                                                        tctRedirect('/Home/Index');
+                                                    } else if (result == "1") {
+                                                        alert("Đăng nhập thất bại!");
+                                                    } else {
+                                                        alert("Có lỗi xảy ra!");
+                                                    }
+                                                    
                                                 },
                                                 processData: false,
                                             });
