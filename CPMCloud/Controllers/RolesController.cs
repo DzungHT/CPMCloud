@@ -1,12 +1,13 @@
 ﻿using CPMCloud.CybertronFramework.Common;
 using CPMCloud.Models;
-using CPMCloud.Models.Common;
+using CPMCloud.Models.Entities;
 using CPMCloud.Models.ViewModels;
 using CybertronFramework;
 using CybertronFramework.Libraries;
 using CybertronFramework.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -17,30 +18,27 @@ namespace CPMCloud.Controllers
     [Authorize]
     public class RolesController : Controller
     {
+        CommonBusiness commonBu = new CommonBusiness();
         /// GET: Resources
-        [CybertronAuthorize(Roles = RoleCodes.Roles.INDEX)]
         public ActionResult Index()
         {
             return View();
         }
 
-        [CybertronAuthorize(Roles = RoleCodes.Roles.SEARCH)]
         [HttpPost]
         public async Task<JsonResult> SearchProcess(RoleViewModel formData)
         {
-            ApiClient client = ApiClient.Instance;
             DataTableResponse<Role> dataTableResponse = new DataTableResponse<Role>();
             try
             {
-                var apiResult = await client.PostApiAsync<JsonResultObject<DataTableResponse<Role>>, object>(Resources.URLResources.SEARCH_ROLE + "?offset=" + formData.DataTable.start.ToString() + "&recordPerPage=" + formData.DataTable.length.ToString(),
-                    new { Code = formData.Code, Name = formData.Name }
-                    );
-                if (apiResult != null && apiResult.IsSuccess)
-                {
-                    dataTableResponse = apiResult.Data;
-                    dataTableResponse.draw = formData.DataTable.draw;
-                }
+                List<SqlParameter> parameters = new List<SqlParameter>();
+                string sql = "SELECT * FROM Role a WHERE 1 = 1 ";
+                sql += commonBu.MakeFilterString("a.RoleID", formData.RoleID, ref parameters);
+                sql += commonBu.MakeFilterString("a.Code", formData.Code, ref parameters);
+                sql += commonBu.MakeFilterString("a.Name", formData.Name, ref parameters);
+                sql += commonBu.MakeFilterString("a.Description", formData.Description, ref parameters);
 
+                dataTableResponse = commonBu.Search<Role>(formData.DataTable.start, formData.DataTable.length, sql, "Code,RoleID", parameters.ToArray());
             }
             catch (Exception ex)
             {
@@ -51,28 +49,35 @@ namespace CPMCloud.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<ActionResult> Save(Role app)
+        public async Task<ActionResult> Save(Role obj)
         {
             ApiClient client = ApiClient.Instance;
             try
             {
-                if (Permission.HasPermission(RoleCodes.Roles.INSERT))
+                Role entities = new Role();
+                if (obj.RoleID != 0)
                 {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<Role>, Role>(Resources.URLResources.SAVE_ROLE, app);
-                    ViewBag.Status = "1";
+                    entities = commonBu.Get<Role>(obj.RoleID);
+                    if (entities != null)
+                    {
+                        entities.GetTransferData(obj);
+                        commonBu.Update(entities);
+                        ViewBag.Status = "1";
+                    }
+                    else
+                    {
+                        ViewBag.Status = "-1";
+                    }
                 }
                 else
                 {
-                    ViewBag.Status = "0";
+                    commonBu.Save(obj);
+                    ViewBag.Status = "1";
                 }
-
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("401"))
-                {
-                    ViewBag.Status = "-2";
-                }
+                ViewBag.Status = "-1";
             }
             return PartialView(Constants.VIEW.SAVE_RESULT);
         }
@@ -80,11 +85,10 @@ namespace CPMCloud.Controllers
         [HttpPost]
         public async Task<JsonResult> PrepareUpdate(int id)
         {
-            ApiClient client = ApiClient.Instance;
             try
             {
-                var apiResult = await client.GetApiAsync<JsonResultObject<Role>>(Resources.URLResources.GET_ROLE + id);
-                return Json(apiResult.Data);
+                Role obj = commonBu.Get<Role>(id);
+                return Json(obj);
             }
             catch (Exception ex)
             {
@@ -100,255 +104,112 @@ namespace CPMCloud.Controllers
             ApiClient client = ApiClient.Instance;
             try
             {
-                if (Permission.HasPermission(RoleCodes.Roles.DELETE))
-                {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<String>, object>(Resources.URLResources.DELETE_ROLE + id,
-                    new { });
-                    ViewBag.Status = "1";
-                }
-                else
-                {
-                    ViewBag.Status = "0";
-                }
-
+                roleBusiness.Delete<Role>(id);
+                ViewBag.Status = "1";
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("401"))
-                {
-                    ViewBag.Status = "-2";
-                }
+                ViewBag.Status = "-1";
             }
             return PartialView(Constants.VIEW.SAVE_RESULT);
         }
 
-        #region permission
-        [CybertronAuthorize(Roles = RoleCodes.Roles.SEARCH)]
-        [HttpPost]
-        public async Task<JsonResult> SearchPermissionByRole(PermissionViewModel formData)
-        {
-            ApiClient client = ApiClient.Instance;
-            DataTableResponse<PermissionViewModel> dataTableResponse = new DataTableResponse<PermissionViewModel>();
-            try
-            {
-                var apiResult = await client.PostApiAsync<JsonResultObject<DataTableResponse<PermissionViewModel>>, object>("api/v1/Roles/searchByRole?offset=" + formData.DataTable.start.ToString() + "&recordPerPage=" + formData.DataTable.length.ToString(),
-                    new { RoleID = formData.RoleID, Code = formData.Code, Name = formData.Name }
-                    );
-                if (apiResult != null && apiResult.IsSuccess)
-                {
-                    dataTableResponse = apiResult.Data;
-                }
 
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return Json(dataTableResponse, JsonRequestBehavior.AllowGet);
-        }
-
-        [CybertronAuthorize(Roles = RoleCodes.Roles.SEARCH)]
-        [HttpPost]
-        public async Task<JsonResult> SearchPermissionForRole(PermissionViewModel formData)
-        {
-            ApiClient client = ApiClient.Instance;
-            DataTableResponse<PermissionViewModel> dataTableResponse = new DataTableResponse<PermissionViewModel>();
-            try
-            {
-                var apiResult = await client.PostApiAsync<JsonResultObject<DataTableResponse<PermissionViewModel>>, object>("api/v1/Roles/searchPermissionForRole?offset=" + formData.DataTable.start.ToString() + "&recordPerPage=" + formData.DataTable.length.ToString(),
-                    new { RoleID = formData.RoleID, Code = formData.Code, Name = formData.Name, ApplicationID = formData.ApplicationID }
-                    );
-                if (apiResult != null && apiResult.IsSuccess)
-                {
-                    dataTableResponse = apiResult.Data;
-                }
-
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return Json(dataTableResponse, JsonRequestBehavior.AllowGet);
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        public async Task<ActionResult> deletePermission(PermissionViewModel formData)
-        {
-            ApiClient client = ApiClient.Instance;
-            try
-            {
-                if (Permission.HasPermission(RoleCodes.Roles.DELETE))
-                {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<String>, object>("api/v1/Roles/deletePermission",
-                    new { PermissionID = formData.PermissionID, RoleID = formData.RoleID });
-                    ViewBag.Status = "1";
-                }
-                else
-                {
-                    ViewBag.Status = "0";
-                }
-
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("401"))
-                {
-                    ViewBag.Status = "-2";
-                }
-            }
-            return PartialView(Constants.VIEW.SAVE_RESULT);
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        public async Task<ActionResult> AddPermissions(PermissionViewModel app)
-        {
-            ApiClient client = ApiClient.Instance;
-            try
-            {
-                if (Permission.HasPermission(RoleCodes.Roles.UPDATE))
-                {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<PermissionViewModel>, PermissionViewModel>("api/v1/Roles/addPermissions", app);
-                    if (apiResult.IsSuccess)
-                    {
-                        ViewBag.Status = "1";
-                    }
-                    else
-                    {
-                        ViewBag.Status = "-1";
-                    }
-                }
-                else
-                {
-                    ViewBag.Status = "0";
-                }
-
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("401"))
-                {
-                    ViewBag.Status = "-2";
-                }
-            }
-            return PartialView(Constants.VIEW.SAVE_RESULT);
-        }
-
-        #endregion
-
-
-
-        [CybertronAuthorize(Roles = RoleCodes.Roles.SEARCH)]
+        #region RoleMenu
         [HttpPost]
         public async Task<JsonResult> SearchMenuByRole(MenuViewModel formData)
         {
-            ApiClient client = ApiClient.Instance;
             DataTableResponse<MenuViewModel> dataTableResponse = new DataTableResponse<MenuViewModel>();
             try
             {
-                var apiResult = await client.PostApiAsync<JsonResultObject<DataTableResponse<MenuViewModel>>, object>("api/v1/Roles/searchMenuByRole?offset=" + formData.DataTable.start.ToString() + "&recordPerPage=" + formData.DataTable.length.ToString(),
-                    new { RoleID = formData.RoleID, Code = formData.Code, Name = formData.Name }
-                    );
-                if (apiResult != null && apiResult.IsSuccess)
-                {
-                    dataTableResponse = apiResult.Data;
-                }
+                List<SqlParameter> parameters = new List<SqlParameter>();
+                string sql = @"SELECT m.*, a.Name as ApplicationName FROM Menu m
+                                INNER JOIN Application a ON a.ApplicationID = m.ApplicationID
+                                INNER JOIN RoleMenu rm ON rm.MenuID = m.MenuID
+                                WHERE 1 = 1 ";
+                sql += commonBu.MakeFilterString("m.Code", formData.Code, ref parameters);
+                sql += commonBu.MakeFilterString("m.Name", formData.Name, ref parameters);
+                sql += commonBu.MakeFilterString("m.ApplicationID", formData.ApplicationID, ref parameters);
+                sql += commonBu.MakeFilterString("rm.RoleID", formData.RoleID, ref parameters);
 
+                var data = commonBu.Search<MenuViewModel>(formData.DataTable.start, formData.DataTable.length, sql, "ApplicationID,Sort_Order", parameters.ToArray());
             }
             catch (Exception ex)
             {
-
             }
             return Json(dataTableResponse, JsonRequestBehavior.AllowGet);
         }
 
-        [CybertronAuthorize(Roles = RoleCodes.Roles.SEARCH)]
         [HttpPost]
         public async Task<JsonResult> SearchMenuForRole(MenuViewModel formData)
         {
-            ApiClient client = ApiClient.Instance;
             DataTableResponse<MenuViewModel> dataTableResponse = new DataTableResponse<MenuViewModel>();
             try
             {
-                var apiResult = await client.PostApiAsync<JsonResultObject<DataTableResponse<MenuViewModel>>, object>("api/v1/Roles/searchMenuForRole?offset=" + formData.DataTable.start.ToString() + "&recordPerPage=" + formData.DataTable.length.ToString(),
-                    new { RoleID = formData.RoleID, Code = formData.Code, Name = formData.Name, ApplicationID = formData.ApplicationID }
-                    );
-                if (apiResult != null && apiResult.IsSuccess)
-                {
-                    dataTableResponse = apiResult.Data;
-                }
+                List<SqlParameter> parameters = new List<SqlParameter>();
+                string sql = @"SELECT m.*, a.Name as ApplicationName FROM Menu m
+INNER JOIN Application a ON a.ApplicationID = m.ApplicationID
+WHERE 1 = 1  AND NOT EXISTS(SELECT 1 FROM RoleMenu rm WHERE rm.MenuID = m.MenuID AND rm.RoleID = @RoleID)";
+                parameters.Add(new SqlParameter("@RoleID", formData.RoleID));
+                sql += commonBu.MakeFilterString("m.Code", formData.Code, ref parameters);
+                sql += commonBu.MakeFilterString("m.Name", formData.Name, ref parameters);
+                sql += commonBu.MakeFilterString("m.ApplicationID", formData.ApplicationID, ref parameters);
 
+                dataTableResponse = commonBu.Search<MenuViewModel>(formData.DataTable.start, formData.DataTable.length, sql, "ApplicationID,Sort_Order", parameters.ToArray());
             }
             catch (Exception ex)
             {
-
             }
             return Json(dataTableResponse, JsonRequestBehavior.AllowGet);
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<ActionResult> DeleteMenu(MenuViewModel formData)
+        public async Task<ActionResult> DeleteMenu(MenuViewModel obj)
         {
-            ApiClient client = ApiClient.Instance;
+            var trans = commonBu.getDbContext().Database.BeginTransaction();
             try
             {
-                if (Permission.HasPermission(RoleCodes.Roles.DELETE))
-                {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<String>, object>("api/v1/Roles/deleteMenu",
-                    new { MenuID = formData.MenuID, RoleID = formData.RoleID });
-                    ViewBag.Status = "1";
-                }
-                else
-                {
-                    ViewBag.Status = "0";
-                }
-
+                string sql = " DELETE RoleMenu WHERE MenuID = @MenuID AND RoleID = @RoleID ";
+                int n = commonBu.getDbContext().Database.ExecuteSqlCommand(sql, new SqlParameter("@MenuID", obj.MenuID), new SqlParameter("@RoleID", obj.RoleID));
+                trans.Commit();
+                ViewBag.Status = "1";
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("401"))
-                {
-                    ViewBag.Status = "-2";
-                }
+                trans.Rollback();
+                ViewBag.Status = "-1";
             }
             return PartialView(Constants.VIEW.SAVE_RESULT);
         }
 
-        [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<ActionResult> AddMenus(MenuViewModel app)
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddMenus(MenuViewModel obj)
         {
-            ApiClient client = ApiClient.Instance;
+            var trans = commonBu.getDbContext().Database.BeginTransaction();
             try
             {
-                if (Permission.HasPermission(RoleCodes.Roles.UPDATE))
+                List<SqlParameter> parameters = new List<SqlParameter>();
+                string sql = "";
+                foreach (var MenuID in obj.Selection)
                 {
-                    var apiResult = await client.PostApiAsync<JsonResultObject<MenuViewModel>, MenuViewModel>("api/v1/Roles/addMenus", app);
-                    if (apiResult.IsSuccess)
-                    {
-                        ViewBag.Status = "1";
-                    }
-                    else
-                    {
-                        ViewBag.Status = "-1";
-                    }
+                    string param = "@MenuID" + parameters.Count;
+                    sql += @" INSERT INTO RoleMenu (RoleID, MenuID) Values(@RoleID, " + param + ") ";
+                    parameters.Add(new SqlParameter(param, MenuID));
                 }
-                else
-                {
-                    ViewBag.Status = "0";
-                }
-
+                parameters.Add(new SqlParameter("@RoleID", obj.RoleID));
+                int n = commonBu.getDbContext().Database.ExecuteSqlCommand(sql, parameters.ToArray());
+                trans.Commit();
+                ViewBag.Status = "1";
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("401"))
-                {
-                    ViewBag.Status = "-2";
-                }
+                ViewBag.Status = "-1";
+                trans.Rollback();
             }
             return PartialView(Constants.VIEW.SAVE_RESULT);
         }
+        #endregion
     }
 }
