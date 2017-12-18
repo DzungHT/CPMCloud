@@ -129,7 +129,7 @@ namespace CPMCloud.Controllers
                 sql += commonBu.MakeFilterString("m.ApplicationID", formData.ApplicationID, ref parameters);
                 sql += commonBu.MakeFilterString("rm.RoleID", formData.RoleID, ref parameters);
 
-                var data = commonBu.Search<MenuViewModel>(formData.DataTable.start, formData.DataTable.length, sql, "ApplicationID,Sort_Order", parameters.ToArray());
+                dataTableResponse = commonBu.Search<MenuViewModel>(formData.DataTable.start, formData.DataTable.length, sql, "ApplicationID,Sort_Order", parameters.ToArray());
             }
             catch (Exception ex)
             {
