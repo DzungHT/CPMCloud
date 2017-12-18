@@ -101,11 +101,7 @@
             $scope.dataSearch = { };
             $scope.listApplication = [];
             $scope.dataSave = {};
-            $scope.searchPermission = {};
             $scope.listApplication = [];
-            $scope.selectPermission = {
-                Selection: []
-            };
 
             $scope.dataTable = $("#searchResult").DataTable({
                 ajax: {
@@ -147,98 +143,6 @@
                     },
                 ]
             });
-
-            $scope.rolePermissionTbl =$("#rolePermissionTbl").DataTable({
-                ajax: {
-                    url: '/Roles/SearchPermissionByRole',
-                    type: 'POST',
-                    data: function (d) {
-                        $scope.searchPermission.DataTable = d;
-                        $scope.searchPermission.RoleID = $scope.dataSave.RoleID;
-                        return $scope.searchPermission;
-                    }
-                },
-                deferLoading:0,
-                columns: [
-                    {
-                        searchable: false,
-                        orderable: false,
-                        data: null,
-                        className: "text-center",
-                        render: function (data, type, row, cell) {
-                            var info = $scope.dataTable.page.info();
-                            var stt = 1 + (info.page * info.length) + cell.row;
-                            return stt;
-                        }
-                    },
-                    { data: 'Code', className: "text-center" },
-                    { data: 'Name' },
-                    { data: 'ApplicationName' },
-                    {
-                        searchable: false,
-                        orderable: false,
-                        data: null,
-                        className: "text-center",
-                        render: function (data, type, row, cell) {
-                            return '<a href="javascript:;" onclick= "deletePermission(' + data.PermissionID + ')" class="red">'
-                                + '<i class="fa fa-remove fa-2x" title="Xóa"></i>'
-                                + '</a>';
-                        }
-                    },
-                ]
-            });
-
-            $scope.selectPermissionTbl = $("#selectPermissionTbl").DataTable({
-                ajax: {
-                    url: '/Roles/SearchPermissionForRole',
-                    type: 'POST',
-                    data: function (d) {
-                        $scope.searchPermission.DataTable = d;
-                        $scope.searchPermission.RoleID = $scope.dataSave.RoleID;
-                        return $scope.searchPermission;
-                    }
-                },
-                deferLoading: 0,
-                columns: [
-                    {
-                        searchable: false,
-                        orderable: false,
-                        data: null,
-                        className: "text-center",
-                        render: function (data, type, row, cell) {
-                            var info = $scope.dataTable.page.info();
-                            var stt = 1 + (info.page * info.length) + cell.row;
-                            return stt;
-                        }
-                    },
-                    { data: 'Code', className: "text-center" },
-                    { data: 'Name' },
-                    { data: 'ApplicationName' },
-                    {
-                        searchable: false,
-                        orderable: false,
-                        data: null,
-                        className: "text-center",
-                        render: function (data, type, row, cell) {
-                            return `<div class="checkbox">
-    <label>
-        <input type="checkbox" class="flat"
-               name="permission[]"
-               value="` + data.PermissionID + `">
-    </label>
-</div>`;
-                        }
-                    },
-                ],
-                drawCallback: function (settings) {
-                    this.api().responsive.recalc();
-                    $('input.flat').iCheck({
-                        checkboxClass: 'icheckbox_flat-green',
-                        radioClass: 'iradio_flat-green'
-                    });
-                }
-            });
-
             $scope.roleMenuTbl = $("#roleMenuTbl").DataTable({
                 ajax: {
                     url: '/Roles/SearchMenuByRole',
@@ -257,7 +161,7 @@
                         data: null,
                         className: "text-center",
                         render: function (data, type, row, cell) {
-                            var info = $scope.dataTable.page.info();
+                            var info = $scope.roleMenuTbl.page.info();
                             var stt = 1 + (info.page * info.length) + cell.row;
                             return stt;
                         }
@@ -297,7 +201,7 @@
                         data: null,
                         className: "text-center",
                         render: function (data, type, row, cell) {
-                            var info = $scope.dataTable.page.info();
+                            var info = $scope.selectMenuTbl.page.info();
                             var stt = 1 + (info.page * info.length) + cell.row;
                             return stt;
                         }
@@ -329,39 +233,6 @@
                     });
                 }
             });
-
-            $scope.searchPermissionForRole = function () {
-                $("#selectPermissionTbl").DataTable().ajax.reload();
-            }
-
-            $scope.goAddPermission = function() {
-                $('#selectPermisson').modal('show');
-                $scope.searchPermissionForRole();
-            }
-            $scope.addPermission = function () {
-                var flag = 'flagSaveResult';
-                var url = '/Roles/AddPermissions';
-                var formData = getFormAsJson('saveForm');
-                formData.RoleID = $scope.dataSave.RoleID;
-                var ids = [];
-                $('#selectPermissionTbl input:checked').each(function () {
-                    ids.push(this.value);
-                });
-                formData.Selection = ids;
-                tctDeferredAjax(flag, url, formData).fail(function () {
-                    alert('Có lỗi xảy ra!');
-                    tctResetProgress();
-                }).done(function () {
-                    $('#selectPermisson').modal('hide');
-                    $scope.searchPermission();
-                });
-            }
-
-            $scope.searchPermission = function () {
-                if ($('#searchPermission').validationEngine("validate")) {
-                    $("#rolePermissionTbl").DataTable().ajax.reload();
-                }
-            }
 
             $scope.searchMenuForRole = function () {
                 $("#selectMenuTbl").DataTable().ajax.reload();
@@ -395,6 +266,22 @@
                     $("#roleMenuTbl").DataTable().ajax.reload();
                 }
             }
+
+            function init() {
+                $('#selectPermisson').modal({
+                    show: false
+                });
+                $http({
+                    method: 'GET',
+                    url: '/MasterData/GetListApplication'
+                }).then(function successCallback(response) {
+                    $scope.listApplication = response.data;
+                }, function errorCallback(response) {
+
+                });
+            }
+
+            init();
         }]);
         function search() {
             var scope = angular.element($('#ApplicationApp')).scope();
@@ -433,7 +320,6 @@
             var url = "/Roles/prepareUpdate?id=" + id;
             var data = '';
             var scope = angular.element($('#ApplicationApp')).scope();
-            scope.searchPermission();
             scope.searchMenu();
             tctDeferredAjaxGet(url, data).done(function (data) {
                 var scope = angular.element($('#ApplicationApp')).scope();
@@ -482,26 +368,22 @@
                 }, 'Bạn có muốn thực hiện ?');
             }
         }
-
-        function deletePermission(PermissionID) {
+        function deleteMenu(MenuID) {
             tctConfirm(function () {
-                var url = '/Roles/deletePermission';
+                var url = '/Roles/deleteMenu';
                 var formData = getFormAsJson('searchForm');
                 var flag = 'flagSaveResult';
                 var scope = angular.element($('#ApplicationApp')).scope();
                 formData.RoleID = scope.dataSave.RoleID;
-                formData.PermissionID = PermissionID;
+                formData.MenuID = MenuID;
                 tctDeferredAjax(flag, url, formData).fail(function () {
                     alert('Hết phiên làm việc!');
                     tctResetProgress();
                 }).done(function () {
                     var scope = angular.element($('#ApplicationApp')).scope();
-                    scope.searchPermission();
+                    scope.searchMenu();
                 });
             }, 'Bạn muốn xóa bản ghi này ?');
         }
-
-        
-        
     </script>
 }

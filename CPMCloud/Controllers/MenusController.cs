@@ -88,7 +88,6 @@ namespace CPMCloud.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            ApiClient client = ApiClient.Instance;
             try
             {
                 commonBu.Delete<Menu>(id);

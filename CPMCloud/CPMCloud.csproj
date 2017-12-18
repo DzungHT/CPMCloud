@@ -173,6 +173,7 @@
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MasterDataController.cs" />
+    <Compile Include="Controllers\MenusController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="CybertronFramework\BaseBusiness.cs" />
     <Compile Include="CybertronFramework\CommonBusiness.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\AccountViewModel.cs" />
     <Compile Include="Models\ViewModels\ApplicationsViewModel.cs" />
+    <Compile Include="Models\ViewModels\MenuDTO.cs" />
     <Compile Include="Models\ViewModels\MenuViewModel.cs" />
     <Compile Include="Models\ViewModels\PermissionViewModel.cs" />
     <Compile Include="Models\ViewModels\ResourceViewModel.cs" />

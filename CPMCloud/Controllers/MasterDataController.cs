@@ -19,5 +19,10 @@ namespace CPMCloud.Controllers
             List<Menu> lstResult = commonBu.GetAll<Menu>();
             return Json(lstResult, JsonRequestBehavior.AllowGet);
         }
+        public JsonResult GetListApplication()
+        {
+            List<Application> lstResult = commonBu.GetAll<Application>();
+            return Json(lstResult, JsonRequestBehavior.AllowGet);
+        }
     }
 }
