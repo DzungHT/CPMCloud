@@ -1,0 +1,65 @@
+﻿<div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="title_left">
+        <h3 ng-if="dataSave.UserID == ''">Thêm mới người dùng</h3>
+        <h3 ng-if="dataSave.UserID != ''">Cập nhật người dùng</h3>
+    </div>
+</div>
+<div class="x_panel">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <form id="saveForm" class="form-horizontal form-label-left">
+            @Html.AntiForgeryToken()
+            <input ng-model="dataSave.UserID" id="UserID" name="UserID" type="hidden">
+
+            <div class="form-group no-padding">
+                <label class="control-label col-sm-2">
+                    Tên đăng nhập <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.LoginName" id="_LoginName" name="LoginName" type="text" class="form-control validate[required,maxSize[255]]" placeholder="Tên đăng nhập">
+                </div>
+                
+                <label class="control-label col-sm-2">
+                    Mật khẩu <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.Password" ng-readonly="dataSave.UserID != ''" id="_Password" name="Password" type="password" class="form-control validate[required,maxSize[255]]" placeholder="Mật khẩu">
+                </div>
+            </div>
+            <div class="form-group no-padding">
+                <label class="control-label col-sm-2">
+                    Số điện thoại
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.PhoneNumber" id="PhoneNumber" name="PhoneNumber" type="text" class="form-control validate[optional,maxSize[255]]" placeholder="Số điện thoại">
+                </div>
+                <label class="control-label col-sm-2">
+                    Email
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.Email" id="Email" name="Email" type="text" class="form-control validate[optional,maxSize[255],custom[email]]" placeholder="Email">
+                </div>
+            </div>
+            <div class="form-group no-padding">
+                <label class="control-label col-sm-2">
+                    Tên đầy đủ <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.FullName" id="FullName" name="FullName" type="text" class="form-control validate[required,optional,maxSize[255]]" placeholder="Tên đầy đủ">
+                </div>
+                <label class="control-label col-sm-2">
+                </label>
+                <div class="col-sm-4">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-success" style="float:right" onclick="actionSave()">
+                    Lưu
+                </button>
+                <button type="button" class="btn btn-default" style="float:left" onclick="goSearch()">
+                    Quay lại danh sách
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

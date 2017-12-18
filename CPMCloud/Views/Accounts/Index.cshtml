@@ -1,0 +1,465 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row" id="UserApp" ng-controller="UserController">
+    <div id=formIndex>
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="title_left">
+                <h3>Quản lý người dùng</h3>
+            </div>
+            <div class="title_right">
+                <button type="button" class="btn btn-success btn-add" onclick="goInsert()">
+                    <span class="glyphicons glyphicons-plus-sign"></span>
+                    Thêm mới
+                </button>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Điều kiện tìm kiếm</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <br />
+                    <form id="searchForm" class="form-horizontal form-label-left">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group no-padding">
+                            <label class="control-label col-sm-2">
+                                Tên đăng nhập
+                            </label>
+                            <div class="col-sm-4">
+                                <input ng-model="dataSearch.LoginName" id="LoginName" name="LoginName" type="text" class="form-control validate[optional,maxSize[255]]" placeholder="Tên đăng nhập">
+                            </div>
+                            <label class="control-label col-sm-2">
+                                Tên đầy đủ
+                            </label>
+                            <div class="col-sm-4">
+                                <input ng-model="dataSearch.FullName" id="FullName" name="FullName" type="text" class="form-control validate[optional,maxSize[255]]" placeholder="Tên đầy đủ">
+                            </div>
+                        </div>
+                        <div class="form-group no-padding">
+                            <label class="control-label col-sm-2">
+                                Số điện thoại
+                            </label>
+                            <div class="col-sm-4">
+                                <input ng-model="dataSearch.PhoneNumber" id="PhoneNumber" name="PhoneNumber" type="text" class="form-control validate[optional,maxSize[255]]" placeholder="Số điện thoại">
+                            </div>
+                            <label class="control-label col-sm-2">
+                                Email
+                            </label>
+                            <div class="col-sm-4">
+                                <input ng-model="dataSearch.Email" id="Email" name="Email" type="text" class="form-control validate[optional,maxSize[255],custom[email]]" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="form-group no-padding">
+                            <label class="control-label col-sm-2">
+                                Trạng thái
+                            </label>
+                            <div class="col-sm-4">
+                                <select class="form-control"ng-model="dataSearch.Status" id="Status">
+                                    <option selected value="">--Chọn tất cả--</option>
+                                    <option value="1">Hoạt động</option>
+                                    <option value="0">Khóa</option>
+                                </select>
+                            </div>
+                            <label class="control-label col-sm-2">
+                            </label>
+                            <div class="col-sm-4">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="text-right" style="padding-right: 5px;">
+                                <button type="button" class="btn btn-default" onclick="search()">
+                                    <span class="glyphicons glyphicons-search green"></span>
+                                    Tìm kiếm
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="onResetForm()">
+                                    <span class="glyphicons glyphicons-remove red"></span>
+                                    Xóa bộ lọc
+                                </button>
+                            </div>
+                         </div>                    
+               </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Kết quả tìm kiếm</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content table-responsive">
+                    <table id="searchResult" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Tên đầy đủ</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Trạng thái</th>
+                                <th>Vai trò</th>
+                                <th>Tác động</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id=formSave style="display:none">
+        @RenderPage("Form.cshtml");
+    </div>
+    <div id="formAddRole" style="display:none">
+        @RenderPage("AddRole.cshtml");
+    </div>
+</div>
+<div id="flagSaveResult" style="display:none"></div>
+
+@section script{   
+    <script>
+        var ctrl = app.controller('UserController', ['$scope', function ($scope) {
+            $scope.dataSearch = {};
+            $scope.dataSave = {};
+            $scope.dataSearchRole = {};
+            $scope.dataSearchRoleAll = {};
+            $scope.selectRole = {
+                Selection: []
+            };
+            
+            $scope.dataTable = $("#searchResult").DataTable({
+                order: [[2, "asc"]],
+                ajax: {
+                    url: '/Accounts/searchProcess',
+                    type: 'POST',
+                    data: function (d) {
+                        $scope.dataSearch.DataTable = d;
+                        return $scope.dataSearch;
+                    }
+                },
+                columns: [
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            var info = $scope.dataTable.page.info();
+                            var stt = 1 + (info.page * info.length) + cell.row;
+                            return stt;
+                        }
+                    },
+                    { data: 'LoginName', },
+                    { data: 'FullName' },
+                    { data: 'Email' },
+                    { data: 'PhoneNumber' },
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            return data.Status == 1 ? 'Hoạt động' : 'Khóa';
+                        }
+                    },
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            if (data.Status == 1) {
+                                return '<a href="javascript:;" onclick="goAddRole(' + data.UserID + ')" class="text-success" style="margin-right: 7px">'
+                                       + '<i class="fa fa-edit fa-2x" title="Sửa vai trò"></i>'
+                                       + '</a>';
+                            }
+                            return "";
+                        }
+                    },
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            var icon = data.Status == 1 ? 'fa-unlock' : 'fa-lock';
+                            var _class = data.Status == 1 ? 'green' : 'orange';
+                            var _title = data.Status == 1 ? 'Khóa' : 'Mở khóa';
+                            return '<a href="javascript:;" onclick="goEdit(' + data.UserID + ')" class="text-success" style="margin-right: 7px">'
+                                   + '<i class="fa fa-edit fa-2x" title="Sửa"></i>'
+                                   +'</a>'
+                                   + '<a href="javascript:;" onclick= "restartPassword(' + data.UserID + ')" style="margin-right: 7px" class="red">'
+                                   + '<i class="fa fa-refresh fa-2x" title="Restart"></i>'
+                                   + '</a>'
+                                   + '<a href="javascript:;" onclick= "lockUnlock(' + data.UserID + ')" class="' + _class + '">'
+                                   + '<i class="fa ' + icon + ' fa-2x" title="' + _title + '"></i>'
+                                   + '</a>';
+                        }
+                    },
+                ]
+            });
+            $scope.roleTbl = $("#roleTbl").DataTable({
+                ajax: {
+                    url: '/Accounts/searchRoleByUser',
+                    type: 'POST',
+                    data: function (d) {
+                        $scope.dataSearchRole.DataTable = d;
+                        return $scope.dataSearchRole;
+                    }
+                },
+                columns: [
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            var info = $scope.dataTable.page.info();
+                            var stt = 1 + (info.page * info.length) + cell.row;
+                            return stt;
+                        }
+                    },
+                    { data: 'Code', className: "text-center" },
+                    { data: 'Name' },
+                    { data: 'Description' },
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            return '<a href="javascript:;" onclick= "deleteRoleFromUser(' + data.RoleID + ')" class="red">'
+                                   + '<i class="fa fa-remove fa-2x" title="Xóa"></i>'
+                                   + '</a>';
+                        }
+                    },
+                ]
+            });
+            $scope.selectRoleTbl = $("#selectRoleTbl").DataTable({
+                ajax: {
+                    url: '/Roles/searchProcess',
+                    type: 'POST',
+                    data: function (d) {
+                        $scope.dataSearchRoleAll.DataTable = d;
+                        return $scope.dataSearchRoleAll;
+                    }
+                },
+                deferLoading: 0,
+                columns: [
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            var info = $scope.dataTable.page.info();
+                            var stt = 1 + (info.page * info.length) + cell.row;
+                            return stt;
+                        }
+                    },
+                    { data: 'Code', className: "text-center" },
+                    { data: 'Name' },
+                    { data: 'Description' },
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            return '<div class="checkbox">'
+                                    +'<label>'
+                                    +'<input type="checkbox" class="flat"'
+                                         +'   name="role"'
+                                        +'    value="' + data.RoleID + '"'
+                                         + '   ng-checked="selectRole.selection.indexOf(' + data.RoleID + ') > -1"'
+                                        +'    onchange="">'
+                                  +'  </label>'
+                                 +'   </div>';
+                        }
+                    },
+                ],
+                drawCallback: function (settings) {
+                    this.api().responsive.recalc();
+                    $('input.flat').iCheck({
+                        checkboxClass: 'icheckbox_flat-green',
+                        radioClass: 'iradio_flat-green'
+                    });
+                    var scope = angular.element($('#UserApp')).scope();
+                    scope.$apply();
+                }
+            });
+            
+        }]);
+        function search() {
+            var scope = angular.element($('#UserApp')).scope();
+            if ($('#searchForm').validationEngine("validate")) {
+                scope.dataTable.ajax.reload();
+            }
+        }
+        function onResetForm(e) {
+            var scope = angular.element($('#UserApp')).scope();
+            debugger;
+            if (e === 'save') {
+                scope.dataSave.UserID = "";
+                scope.dataSave.LoginName = "";
+                scope.dataSave.FullName = "";
+                scope.dataSave.PhoneNumber = "";
+                scope.dataSave.Email = "";
+                scope.dataSave.Password = "";
+            } else {
+                scope.dataSearch.LoginName = "";
+                scope.dataSearch.FullName = "";
+                scope.dataSearch.PhoneNumber = "";
+                scope.dataSearch.Email = "";
+                scope.dataSearch.Status = "";
+            }
+            scope.$apply();
+        }
+        function restartPassword(id) {
+            tctConfirm(function () {
+                var url = '/Accounts/RestartPassword';
+                var formData = getFormAsJson('searchForm');
+                var flag = 'flagSaveResult';
+                formData.id = id;
+                tctDeferredAjax(flag, url, formData).fail(function () {
+                    alert('Có lỗi xảy ra!');
+                    tctResetProgress();
+                }).done(function () {
+                    search();
+                });
+            }, 'Restart password về dạng 123456 ?');
+        }
+        function lockUnlock(id) {
+            tctConfirm(function () {
+                var url = '/Accounts/LockUnlock';
+                var formData = getFormAsJson('searchForm');
+                var flag = 'flagSaveResult';
+                formData.id = id;
+                tctDeferredAjax(flag, url, formData).fail(function () {
+                    alert('Có lỗi xảy ra!');
+                    tctResetProgress();
+                }).done(function () {
+                    search();
+                });
+            }, 'Xác nhận thay đổi trạng thái bản ghi ?');
+        }
+        function goEdit(id) {
+            var url = "/Accounts/prepareUpdate?id=" + id;
+            var data = '';
+            tctDeferredAjaxGet(url, data).done(function (data) {
+                console.log(data);
+                var scope = angular.element($('#UserApp')).scope();
+                scope.dataSave.UserID = data.UserID;
+                scope.dataSave.LoginName = data.LoginName;
+                scope.dataSave.FullName = data.FullName;
+                scope.dataSave.PhoneNumber = data.PhoneNumber;
+                scope.dataSave.Email = data.Email;
+                scope.dataSave.Password = data.Password;
+                scope.$apply();
+                goInsert(true);
+            }).fail(function () {
+                alert('Có lỗi xảy ra!');
+                tctResetProgress();
+            });
+        }
+        function goInsert(e) {
+            if (!e) {
+                onResetForm('save');
+            }
+            $('#formIndex').hide();
+            $('#formSave').show();
+            $('#formAddRole').hide();
+        }
+        function goSearch() {
+            search();
+            $('#formIndex').show();
+            $('#formSave').hide();
+            $('#formAddRole').hide();
+        }
+        function actionSave() {
+            if ($('#saveForm').validationEngine("validate")) {
+                tctConfirm(function () {
+                    var url = '/Accounts/save';
+                    var formData = getFormAsJson('saveForm');
+                    var flag = 'flagSaveResult';
+                    var scope = angular.element($('#UserApp')).scope();
+                    formData.UserID = scope.dataSave.UserID;
+                    tctDeferredAjax(flag, url, formData).fail(function () {
+                        alert('Có lỗi xảy ra!');
+                        tctResetProgress();
+                    }).done(function () {
+                        goSearch();
+                    });
+                }, 'Bạn có muốn thực hiện ?');
+            }
+        }
+
+        function goAddRole(id) {
+            var scope = angular.element($('#UserApp')).scope();
+            scope.dataSearchRole.UserID = id;
+            searchRoleUser();
+            $('#formIndex').hide();
+            $('#formSave').hide();
+            $('#formAddRole').show();
+        }
+        function searchRoleUser() {
+            var scope = angular.element($('#UserApp')).scope();
+            scope.roleTbl.ajax.reload();
+        }
+        function goAddRoleUser() {
+            $('#selectRole').modal('show');
+            searchRoleAll();
+        }
+
+        function searchRoleAll() {
+            var scope = angular.element($('#UserApp')).scope();
+            scope.selectRoleTbl.ajax.reload();
+        }
+
+        function addRoleUser() {
+            var flag = 'flagSaveResult';
+            var url = '/Accounts/AddRoleUser';
+            var formData = getFormAsJson('saveForm');
+            var scope = angular.element($('#UserApp')).scope();
+            formData.UserID = scope.dataSearchRole.UserID;
+            var ids = [];
+            $('#selectRoleTbl input:checked').each(function () {
+                ids.push(this.value);
+            });
+            formData.Selection = ids;
+            tctDeferredAjax(flag, url, formData).fail(function () {
+                alert('Có lỗi xảy ra!');
+                tctResetProgress();
+            }).done(function () {
+                $('#selectRole').modal('hide');
+                searchRoleUser();
+            });
+        }
+
+        function deleteRoleFromUser(id) {
+            tctConfirm(function () {
+                var url = '/Accounts/DeleteRoleUser';
+                var formData = getFormAsJson('searchForm');
+                var flag = 'flagSaveResult';
+                formData.RoleID = id;
+                var scope = angular.element($('#UserApp')).scope();
+                formData.UserID = scope.dataSearchRole.UserID;
+                tctDeferredAjax(flag, url, formData).fail(function () {
+                    alert('Hết phiên làm việc!');
+                    tctResetProgress();
+                }).done(function () {
+                    searchRoleUser()
+                });
+            }, 'Bạn muốn xóa bản ghi này ?');
+        }
+    </script>
+}

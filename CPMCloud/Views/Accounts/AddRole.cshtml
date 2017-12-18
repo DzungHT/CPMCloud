@@ -1,0 +1,115 @@
+﻿<div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="title_left">
+        <h3 ng-if="dataSearchRole.UserID != ''">Vai trò của người dùng</h3>
+    </div>
+</div>
+
+<div class="x_panel">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <form id="searchRole" class="form-horizontal form-label-left">
+                @Html.AntiForgeryToken()
+                <div class="form-group no-padding">
+                    <label class="control-label col-sm-2">
+                        Mã vai trò
+                    </label>
+                    <div class="col-sm-4">
+                        <input ng-model="dataSearchRole.Code" id="CodeFilter" name="Code" type="text" class="form-control validate[optional,maxSize[255]]">
+                    </div>
+                    <label class="control-label col-sm-2">
+                        Tên vai trò
+                    </label>
+                    <div class="col-sm-4">
+                        <input ng-model="dataSearchRole.Name" id="NameFilter" name="Name" type="text" class="form-control validate[optional,maxSize[255]]">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="text-center" style="padding-right: 5px;">
+                        <button type="button" class="btn btn-default" onclick="searchRoleUser()">
+                            <span class="glyphicons glyphicons-search green"></span>
+                            Tìm kiếm
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="goAddRoleUser()">
+                            <span class="glyphicons glyphicons-plus-sign"></span>
+                            Thêm quyền
+                        </button>
+                    </div>
+                </div>
+            </form>
+        <div class="ln_solid"></div>
+        <div class="row table-responsive">
+            <table id="roleTbl" class="table table-bordered table-striped table-hover" width="100%">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã vai trò</th>
+                        <th>Tên vai trò</th>
+                        <th>Mô tả</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <button type="button" class="btn btn-default" style="float:left" onclick="goSearch()">
+                Quay lại danh sách
+            </button>
+        </div>
+
+        <div id="selectRole" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Thêm vai trò người dùng</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="searchPermission" class="form-horizontal form-label-left">
+                            @Html.AntiForgeryToken()
+                            <div class="form-group no-padding">
+                                <label class="control-label col-sm-2">
+                                    Mã vai trò
+                                </label>
+                                <div class="col-sm-4">
+                                    <input ng-model="dataSearchRoleAll.Code" id="CodeFilter" name="Code" type="text" class="form-control validate[optional,maxSize[255]]">
+                                </div>
+                                <label class="control-label col-sm-2">
+                                    Tên vai trò
+                                </label>
+                                <div class="col-sm-4">
+                                    <input ng-model="dataSearchRoleAll.Name" id="NameFilter" name="Name" type="text" class="form-control validate[optional,maxSize[255]]">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="text-center" style="padding-right: 5px;">
+                                    <button type="button" class="btn btn-default" onclick="searchRoleAll()">
+                                        <span class="glyphicons glyphicons-search green"></span>
+                                        Tìm kiếm
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="ln_solid"></div>
+                        <table id="selectRoleTbl" class="table table-bordered table-striped table-hover" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã vai trò</th>
+                                    <th>Tên vai trò</th>
+                                    <th>Mô tả</th>
+                                    <th>Chọn</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="addRoleUser()">Thêm vai trò</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </div>
+</div>

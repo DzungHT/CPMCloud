@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Test</title>
+	<script src="./jquery.dataTables.min.js"></script>
+</head>
+<body class="nav-md footer_fixed">
+	<table id="searchResult" class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>ApplicationID</th>
+            <th>Code</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<script>
+        $("#searchResult").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: 'http://cpm.cybertron:12144/api/v1/Users/getAll'
+            },
+            columns: [
+                { data: 'ApplicationID' },
+                { data: 'Code' },
+                { data: 'Name' }
+            ]
+        });
+    </script>
+</body>
+</html>

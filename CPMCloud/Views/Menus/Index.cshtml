@@ -1,0 +1,258 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row" id="MenuApp" ng-controller="MenuController">
+    <div id=formIndex>
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="title_left">
+                <h3>Quản lý menu</h3>
+            </div>
+            <div class="title_right">
+                <button type="button" class="btn btn-success btn-add" onclick="goInsert()">
+                    <span class="glyphicons glyphicons-plus-sign"></span>
+                    Thêm mới
+                </button>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Điều kiện tìm kiếm</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <br />
+                    <form id="searchForm" class="form-horizontal form-label-left">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group no-padding">
+                            <label class="control-label col-sm-2">
+                                Ứng dụng
+                            </label>
+                            <div class="col-sm-4">
+                                <select class="form-control" ui-select2 ng-model="dataSearch.ApplicationID" id="ApplicationID" onchange="search()">
+                                <option>--Chọn tất cả--</option>
+                                <option ng-repeat="x in listApplication" ng-value="{{x.ApplicationID}}">{{x.Code}} - {{x.Name}}</option>
+                                </select>
+                            </div>
+                            <label class="control-label col-sm-2">
+                            </label>
+                            <div class="col-sm-4">
+                            </div>
+                        </div>
+                        <div class="form-group no-padding">
+                            <label class="control-label col-sm-2">
+                                Mã menu
+                            </label>
+                            <div class="col-sm-4">
+                                <input ng-model="dataSearch.Code" id="CodeFilter" name="Code" type="text" class="form-control validate[optional,maxSize[255]]" placeholder="Mã ứng dụng">
+                            </div>
+                            <label class="control-label col-sm-2">
+                                Tên menu
+                            </label>
+                            <div class="col-sm-4">
+                                <input ng-model="dataSearch.Name" id="NameFilter" name="Name" type="text" class="form-control validate[optional,maxSize[255]]" placeholder="Tên ứng dụng">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="text-right" style="padding-right: 5px;">
+                                <button type="button" class="btn btn-default" onclick="search()">
+                                    <span class="glyphicons glyphicons-search green"></span>
+                                    Tìm kiếm
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="onResetForm()">
+                                    <span class="glyphicons glyphicons-remove red"></span>
+                                    Xóa bộ lọc
+                                </button>
+                            </div>
+                         </div>                    
+               </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Kết quả tìm kiếm</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content table-responsive">
+                    <table id="searchResult" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Mã menu</th>
+                                <th>Tên menu</th>
+                                <th>Url</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id=formSave style="display:none">
+        @RenderPage("Form.cshtml");
+    </div>
+</div>
+<div id="flagSaveResult" style="display:none"></div>
+
+@section script{   
+    <script>
+        var ctrl = app.controller('MenuController', ['$scope', function ($scope) {
+            $scope.dataSearch = {};
+            $scope.dataSave = {};
+            $scope.listApplication = [];
+            $scope.listMenu = [];
+            $scope.dataTable = $("#searchResult").DataTable({
+                order: [[2, "asc"]],
+                ajax: {
+                    url: '/menus/searchProcess',
+                    type: 'POST',
+                    data: function (d) {
+                        $scope.dataSearch.DataTable = d;
+                        return $scope.dataSearch;
+                    }
+                },
+                columns: [
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            var info = $scope.dataTable.page.info();
+                            var stt = 1 + (info.page * info.length) + cell.row;
+                            return stt;
+                        }
+                    },
+                    { data: 'Code', className: "text-center" },
+                    { data: 'Name' },
+                    { data: 'Url' },
+                    {
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, cell) {
+                            return '<a href="javascript:;" onclick="goEdit(' + data.MenuID + ')" class="text-success" style="margin-right: 7px">'
+                                   + '<i class="fa fa-edit fa-2x" title="Sửa"></i>'
+                                   +'</a>'
+                                   + '<a href="javascript:;" onclick= "deleteRow(' + data.MenuID + ')" class="red">'
+                                   +'<i class="fa fa-remove fa-2x" title="Xóa"></i>'
+                                   +'</a>';
+                        }
+                    },
+                ]
+            });
+        }]);
+        $(document).ready(function () {
+            var scope = angular.element($('#MenuApp')).scope();
+            $.get('/masterData/getListApplication', function (data) {
+                scope.listApplication = data;
+                scope.$apply();
+            });
+
+            $.get('/masterData/GetListMenu', function (data) {
+                scope.listMenu = data;
+                scope.$apply();
+            });
+        });
+        function search() {
+            var scope = angular.element($('#MenuApp')).scope();
+            if ($('#searchForm').validationEngine("validate")) {
+                scope.dataTable.ajax.reload();
+            }
+        }
+        function onResetForm(e) {
+            var scope = angular.element($('#MenuApp')).scope();
+            if (e === 'save') {
+                scope.dataSave.MenuID = "";
+                scope.dataSave.ApplicationID = "";
+                scope.dataSave.Code = "";
+                scope.dataSave.Name = "";
+                scope.dataSave.MenuPName = "";
+                scope.dataSave.MenuPID = "";
+                scope.dataSave.Sort_Order = "";
+                scope.dataSave.Url = "";
+            } else {
+                scope.dataSearch.ApplicationID = "";
+                scope.dataSearch.Code = "";
+                scope.dataSearch.Name = "";
+            }
+            scope.$apply();
+        }
+        function deleteRow(id) {
+            tctConfirm(function () {
+                var url = '/menus/delete';
+                var formData = getFormAsJson('searchForm');
+                var flag = 'flagSaveResult';
+                formData.id = id;
+                tctDeferredAjax(flag, url, formData).fail(function () {
+                    alert('Hết phiên làm việc!');
+                    tctResetProgress();
+                }).done(function () {
+                    search();
+                });
+            }, 'Bạn muốn xóa bản ghi này ?');
+        }
+        function goEdit(id) {
+            var url = "/menus/prepareUpdate?id=" + id;
+            var data = '';
+            tctDeferredAjaxGet(url, data).done(function (data) {
+                var scope = angular.element($('#MenuApp')).scope();
+                scope.dataSave.MenuID = data.MenuID;
+                scope.dataSave.ApplicationID = data.ApplicationID;
+                scope.dataSave.Code = data.Code;
+                scope.dataSave.Name = data.Name;
+                scope.dataSave.MenuPName = data.MenuPName;
+                scope.dataSave.MenuPID = data.MenuPID;
+                scope.dataSave.Sort_Order = data.Sort_Order;
+                scope.dataSave.Url = data.Url;
+                scope.$apply();
+                goInsert(true);
+            }).fail(function () {
+                alert('Có lỗi xảy ra!');
+                tctResetProgress();
+            });
+        }
+        function goInsert(e) {
+            tctToggleFieldset($('#formIndex'));
+            if (!e) {
+                onResetForm('save');
+            }
+            tctToggleFieldset($('#formSave'));
+        }
+        function goSearch() {
+            tctToggleFieldset($('#formIndex'));
+            tctToggleFieldset($('#formSave'));
+            search();
+        }
+        function actionSave() {
+            if ($('#saveForm').validationEngine("validate")) {
+                tctConfirm(function () {
+                    var url = '/menus/save';
+                    var formData = getFormAsJson('saveForm');
+                    var flag = 'flagSaveResult';
+                    var scope = angular.element($('#MenuApp')).scope();
+                    formData.MenuID = scope.dataSave.MenuID;
+                    formData.ApplicationID = scope.dataSave.ApplicationID;
+                    formData.MenuPID = scope.dataSave.MenuPID;
+                    tctDeferredAjax(flag, url, formData).fail(function () {
+                        alert('Có lỗi xảy ra!');
+                        tctResetProgress();
+                    }).done(function () {
+                        goSearch();
+                    });
+                }, 'Bạn có muốn thực hiện ?');
+            }
+        }
+    </script>
+}

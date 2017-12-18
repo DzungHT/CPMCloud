@@ -1,0 +1,16 @@
+﻿@{
+    List<Menu> list = (List<Menu>)Session["lstMenu"];
+}
+<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+    <div class="menu_section">
+        @*<h3>General</h3>*@
+        <ul class="nav side-menu">
+            <li><a href="/menus/index">Danh mục Menu</a></li>
+            <li><a href="/roles/index">Danh mục Vai trò</a></li>
+            <li><a href="/applications/index">Quản lý ứng dụng</a></li>
+            <li><a href="/resources/index">Quản lý tài nguyên</a></li>
+            <li><a href="/accounts/index">Quản lý user</a></li>
+
+        </ul>
+    </div>
+</div>

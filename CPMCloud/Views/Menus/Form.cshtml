@@ -1,0 +1,72 @@
+﻿<div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="title_left">
+        <h3 ng-if="dataSave.MenuID == ''">Thêm mới menu</h3>
+        <h3 ng-if="dataSave.MenuID != ''">Cập nhật menu</h3>
+    </div>
+</div>
+<div class="x_panel">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <form id="saveForm" class="form-horizontal form-label-left">
+            @Html.AntiForgeryToken()
+            <input ng-model="dataSave.MenuID" id="MenuID" name="MenuID" type="hidden">
+
+            <div class="form-group no-padding">
+                <label class="control-label col-sm-2">
+                    Mã menu <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.Code" id="Code" name="Code" type="text" class="form-control validate[required,maxSize[255]]">
+                </div>
+                <label class="control-label col-sm-2">
+                    Tên menu <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.Name" id="Name" name="Name" type="text" class="form-control validate[required,maxSize[255]]">
+                </div>
+            </div>
+            <div class="form-group no-padding">
+                <label class="control-label col-sm-2">
+                    Menu cha
+                </label>
+                <div class="col-sm-4">
+                    <select class="form-control validate[required]" ui-select2 ng-model="dataSave.MenuPID" id="MenuPID">
+                        <option>--Chọn--</option>
+                        <option ng-repeat="item in listMenu" ng-value="{{item.MenuID}}">{{item.Name}}</option>
+                    </select>
+                </div>
+                <label class="control-label col-sm-2">
+                    Thứ tự <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.Sort_Order" id="Sort_Order" name="Sort_Order" type="text" class="form-control validate[required,custom[onlyLetterNumber]]">
+                </div>
+            </div>
+            <div class="form-group no-padding">
+                <label class="control-label col-sm-2">
+                    Ứng dụng <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <select class="form-control validate[required]" ui-select2 ng-model="dataSave.ApplicationID" id="ApplicationID">
+                        <option>--Chọn--</option>
+                        <option ng-repeat="x in listApplication" ng-value="{{x.ApplicationID}}">{{x.Code}} - {{x.Name}}</option>
+                    </select>
+                </div>
+                <label class="control-label col-sm-2">
+                    Url <span class="red">*</span>
+                </label>
+                <div class="col-sm-4">
+                    <input ng-model="dataSave.Url" id="Url" name="Url" type="text" class="form-control validate[required,maxSize[255]]">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-success" style="float:right" onclick="actionSave()">
+                    Lưu
+                </button>
+                <button type="button" class="btn btn-default" style="float:left" onclick="goSearch()">
+                    Quay lại danh sách
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

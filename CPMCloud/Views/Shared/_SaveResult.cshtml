@@ -1,0 +1,19 @@
+﻿
+<script>
+    $(document).ready(function () {
+        var runCallBack = function(){
+            if (@ViewBag.Status == "1"){
+                tctShowMessage('success','Thực hiện thành công');
+            } else if (@ViewBag.Status == "-1") {
+                tctShowMessage('error','Có lỗi xảy ra');
+            } else if (@ViewBag.Status == "0"){
+                tctShowMessage('error','Bạn không có quyền truy cập chức năng này');
+            } else {
+                tctConfirmLogin();
+            }
+        };
+        runCallBack();
+    });
+</script>
+
+

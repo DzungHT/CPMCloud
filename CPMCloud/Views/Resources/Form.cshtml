@@ -1,0 +1,56 @@
+﻿<div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2 ng-if="dataSave.ResourceID == ''">Thêm mới tài nguyên</h2>
+            <h2 ng-if="dataSave.ResourceID != ''">Cập nhật tài nguyên</h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <br />
+            <form id="saveForm" class="form-horizontal form-label-left">
+                @Html.AntiForgeryToken()
+                <input ng-model="dataSave.ResourceID" id="ResourceID" name="ResourceID" type="hidden">
+                <div class="form-group no-padding">
+                    <label class="control-label col-sm-2">
+                        Mã tài nguyên <span class="red">*</span>
+                    </label>
+                    <div class="col-sm-4">
+                        <input ng-model="dataSave.Code" id="Code" name="Code" type="text" class="form-control validate[required,maxSize[255]]">
+                    </div>
+                    <label class="control-label col-sm-2">
+                        Tên tài nguyên <span class="red">*</span>
+                    </label>
+                    <div class="col-sm-4">
+                        <input ng-model="dataSave.Name" id="Name" name="Name" type="text" class="form-control validate[required,maxSize[255]]">
+                    </div>
+                </div>
+                <div class="form-group no-padding">
+                    <label class="control-label col-sm-2">
+                        Ứng dụng <span class="red">*</span> 
+                    </label>
+                    <div class="col-sm-4">
+                        <select ng-model="dataSave.ApplicationID" id="ApplicationID" name="ApplicationID" class="form-control validate[required]" ui-select2>
+                            <option value="">-- Chọn --</option>
+                            <option ng-repeat="item in listApplication" value="{{item.ApplicationID}}">{{item.Code}} - {{item.Name}}</option>
+                        </select>
+                    </div>
+                    <label class="control-label col-sm-2">
+                        Mô tả
+                    </label>
+                    <div class="col-sm-4">
+                        <textarea ng-model="dataSave.Description" id="Description" name="Description" class="form-control validate[maxSize[500]]" maxlength="500" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-success" style="float:right" onclick="actionSave()">
+                        Lưu
+                    </button>
+                    <button type="button" class="btn btn-default" style="float:left" onclick="goSearch()">
+                        Quay lại danh sách
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
