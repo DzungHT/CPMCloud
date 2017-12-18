@@ -15,7 +15,6 @@ using System.Web.Mvc;
 
 namespace CPMCloud.Controllers
 {
-    [Authorize]
     public class RolesController : Controller
     {
         CommonBusiness commonBu = new CommonBusiness();
@@ -51,7 +50,6 @@ namespace CPMCloud.Controllers
         [HttpPost]
         public async Task<ActionResult> Save(Role obj)
         {
-            ApiClient client = ApiClient.Instance;
             try
             {
                 Role entities = new Role();
@@ -101,10 +99,9 @@ namespace CPMCloud.Controllers
         [HttpPost]
         public async Task<ActionResult> Delete(int id)
         {
-            ApiClient client = ApiClient.Instance;
             try
             {
-                roleBusiness.Delete<Role>(id);
+                commonBu.Delete<Role>(id);
                 ViewBag.Status = "1";
             }
             catch (Exception ex)
