@@ -14,6 +14,18 @@ namespace CPMCloud
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "HttpErrors",
+                url: "HttpErrors/{httpCode}",
+                defaults: new { controller = "HttpErrors", action = "index", httpCode = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "Templates",
+                url: "templates/{filename}",
+                defaults: new { controller = "Templates", action = "GetTemplate", filename = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
