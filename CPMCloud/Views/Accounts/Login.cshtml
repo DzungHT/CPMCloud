@@ -128,30 +128,30 @@
                                     // signInCallback defined in step 6.
                                     function loginGoogle() {
                                         if (userGoogle) {
-                                            //$.ajax({
-                                            //    type: 'POST',
-                                            //    url: '/Accounts/GoogleLogin',
-                                            //    // Always include an `X-Requested-With` header in every AJAX request,
-                                            //    // to protect against CSRF attacks.
-                                            //    data: JSON.stringify(userGoogle),
-                                            //    dataType: 'json',
-                                            //    headers: {
-                                            //        'X-Requested-With': 'XMLHttpRequest'
-                                            //    },
-                                            //    contentType: 'application/json; charset=utf-8',
-                                            //    success: function (result) {
-                                            //        if (result == "0") {
-                                            //            alert('ádff');
-                                            //            //location.href = '/Home/Index';
-                                            //        } else if (result == "1") {
-                                            //            alert("Đăng nhập không thành công");
-                                            //        } else {
-                                            //            alert("Có lỗi xảy ra!");
-                                            //        }
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: '/Accounts/GoogleLogin',
+                                                // Always include an `X-Requested-With` header in every AJAX request,
+                                                // to protect against CSRF attacks.
+                                                data: JSON.stringify(userGoogle),
+                                                dataType: 'json',
+                                                headers: {
+                                                    'X-Requested-With': 'XMLHttpRequest'
+                                                },
+                                                contentType: 'application/json; charset=utf-8',
+                                                success: function (result) {
+                                                    if (result == "0") {
+                                                        //alert('ádff');
+                                                        location.href = '/Home/Index';
+                                                    } else if (result == "1") {
+                                                        alert("Đăng nhập không thành công");
+                                                    } else {
+                                                        alert("Có lỗi xảy ra!");
+                                                    }
                                                     
-                                            //    },
-                                            //    processData: false,
-                                            //});
+                                                },
+                                                processData: false,
+                                            });
 
                                         }
                                     }

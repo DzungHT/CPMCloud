@@ -11,7 +11,6 @@ using System.Web.Mvc;
 
 namespace CPMCloud.Controllers
 {
-    [Authorize]
     public class MasterDataController : Controller
     {
         CommonBusiness commonBu = new CommonBusiness();

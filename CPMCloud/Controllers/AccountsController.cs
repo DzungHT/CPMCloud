@@ -26,14 +26,14 @@ namespace CPMCloud.Controllers
         public ActionResult Login(string ReturnUrl)
         {
             Session["ReturnUrl"] = ReturnUrl ?? "/";
-            FormsAuthentication.SignOut();
+
             return PartialView();
         }
 
         [HttpGet]
         public ActionResult Logout()
         {
-            FormsAuthentication.SignOut();
+            Session["USER"] = null;
             return RedirectToAction("Login", "Accounts");
         }
         #endregion
@@ -47,7 +47,6 @@ namespace CPMCloud.Controllers
                 if (instance != null)
                 {
                     Session["USER"] = instance;
-                    FormsAuthentication.SetAuthCookie(instance.Email,false);
                     MailHelper.SendEmail(new MailAddress(instance.Email,instance.FullName),"Cảnh báo đăng nhập!","Tài khoản của bạn vừa đăng nhập vào hệ thống CPM");
                     return Json("0");
                 }

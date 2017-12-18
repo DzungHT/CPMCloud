@@ -15,13 +15,16 @@ using System.Web.Mvc;
 
 namespace CPMCloud.Controllers
 {
-    [Authorize]
     public class RolesController : Controller
     {
         CommonBusiness commonBu = new CommonBusiness();
         /// GET: Resources
         public ActionResult Index()
         {
+            if (Session["USER"] == null)
+            {
+                return RedirectToAction("Login", "Accounts");
+            }
             return View();
         }
 

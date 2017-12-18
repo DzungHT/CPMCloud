@@ -12,13 +12,16 @@ using System.Web.Mvc;
 
 namespace CPMCloud.Controllers
 {
-    [Authorize]
     public class MenusController : Controller
     {
         CommonBusiness commonBu = new CommonBusiness();
         // GET: Menus
         public ActionResult Index()
         {
+            if (Session["USER"] == null)
+            {
+                return RedirectToAction("Login", "Accounts");
+            }
             return View();
         }
 
