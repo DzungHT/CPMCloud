@@ -278,6 +278,7 @@
     <Content Include="fonts\glyphicons-social-regular.ttf" />
     <Content Include="fonts\glyphicons-social-regular.woff" />
     <Content Include="fonts\glyphicons-social-regular.woff2" />
+    <None Include="Properties\PublishProfiles\cpm-web - Web Deploy.pubxml" />
     <None Include="Scripts\Common\jquery\jquery-1.12.4.intellisense.js" />
     <Content Include="Scripts\Common\jquery\jquery-1.12.4.js" />
     <Content Include="Scripts\Common\jquery\jquery-1.12.4.min.js" />

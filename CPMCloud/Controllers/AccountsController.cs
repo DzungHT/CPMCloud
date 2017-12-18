@@ -51,12 +51,10 @@ namespace CPMCloud.Controllers
                     MailHelper.SendEmail(new MailAddress(instance.Email,instance.FullName),"Cảnh báo đăng nhập!","Tài khoản của bạn vừa đăng nhập vào hệ thống CPM");
                     return Json("0");
                 }
-                ModelState.AddModelError(string.Empty, "Đăng nhập không thành công!");
                 return Json("1"); ;
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Đăng nhập không thành công!");
                 return Json("2"); ;
             }
         }

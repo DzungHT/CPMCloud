@@ -84,16 +84,6 @@
                         <div style="color:red">
                         @Html.ValidationSummary()
                         </div>
-                        <div>
-                            <input type="text" name="Username" class="form-control" placeholder="" required autofocus/>
-                        </div>
-                        <div>
-                            <input type="password" name="Password" class="form-control" placeholder="" required />
-                        </div>
-                        <div>
-                            <button class="btn btn-default submit">Đăng nhập</button>
-                            <a class="reset_pass" href="#">Quên mật khẩu</a>                 
-                        </div>
                         <div style="text-align:center;">
                             @*<button class="btn btn-default" onclick="loginGoogle()"  id="btnGoogleLogin">Login with Google</button>*@
                             @*<button id="signinButton">Sign in with Google</button>*@
@@ -102,13 +92,13 @@
                                 <span class="buttonText">Đăng nhập bằng Google</span>
                             </div>
 
-                            @*<script src="~/Scripts/Common/CybertronLibrary.js"></script>*@
+                            <script src="~/Scripts/Common/CybertronLibrary.js"></script>
                             <script>
                                 var userGoogle = {};
                                 $('#customBtn').click(function () {
                                     gapi.load('auth2', function () {
                                         auth2 = gapi.auth2.init({
-                                            client_id: '981562863577-pdve3k27c8aggkalvd0n01mb9ln42psk.apps.googleusercontent.com',
+                                            client_id: '981562863577-aitk4qk321bj6ftfaptd5ioenoi4pl3b.apps.googleusercontent.com',
                                             // Scopes to request in addition to 'profile' and 'email'
                                             scope: 'email profile'
                                         });
@@ -138,29 +128,31 @@
                                     // signInCallback defined in step 6.
                                     function loginGoogle() {
                                         if (userGoogle) {
-                                            $.ajax({
-                                                type: 'POST',
-                                                url: '/Accounts/GoogleLogin',
-                                                // Always include an `X-Requested-With` header in every AJAX request,
-                                                // to protect against CSRF attacks.
-                                                data: JSON.stringify(userGoogle),
-                                                dataType: 'json',
-                                                headers: {
-                                                    'X-Requested-With': 'XMLHttpRequest'
-                                                },
-                                                contentType: 'application/json; charset=utf-8',
-                                                success: function (result) {
-                                                    if (result == "0") {
-                                                        tctRedirect('/Home/Index');
-                                                    } else if (result == "1") {
-                                                        alert("Đăng nhập thất bại!");
-                                                    } else {
-                                                        alert("Có lỗi xảy ra!");
-                                                    }
+                                            //$.ajax({
+                                            //    type: 'POST',
+                                            //    url: '/Accounts/GoogleLogin',
+                                            //    // Always include an `X-Requested-With` header in every AJAX request,
+                                            //    // to protect against CSRF attacks.
+                                            //    data: JSON.stringify(userGoogle),
+                                            //    dataType: 'json',
+                                            //    headers: {
+                                            //        'X-Requested-With': 'XMLHttpRequest'
+                                            //    },
+                                            //    contentType: 'application/json; charset=utf-8',
+                                            //    success: function (result) {
+                                            //        if (result == "0") {
+                                            //            alert('ádff');
+                                            //            //location.href = '/Home/Index';
+                                            //        } else if (result == "1") {
+                                            //            alert("Đăng nhập không thành công");
+                                            //        } else {
+                                            //            alert("Có lỗi xảy ra!");
+                                            //        }
                                                     
-                                                },
-                                                processData: false,
-                                            });
+                                            //    },
+                                            //    processData: false,
+                                            //});
+
                                         }
                                     }
                                   });

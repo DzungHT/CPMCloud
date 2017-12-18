@@ -12,6 +12,7 @@ using System.Web.Mvc;
 
 namespace CPMCloud.Controllers
 {
+    [Authorize]
     public class MenusController : Controller
     {
         CommonBusiness commonBu = new CommonBusiness();

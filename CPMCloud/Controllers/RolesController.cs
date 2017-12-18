@@ -15,6 +15,7 @@ using System.Web.Mvc;
 
 namespace CPMCloud.Controllers
 {
+    [Authorize]
     public class RolesController : Controller
     {
         CommonBusiness commonBu = new CommonBusiness();
